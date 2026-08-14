@@ -1,0 +1,186 @@
+const STORAGE_KEY = "pl-schedule-favourites";
+
+const teamsById = Object.fromEntries(TEAMS.map((t) => [t.id, t]));
+
+function loadFavourites() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+function saveFavourites(favourites) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...favourites]));
+}
+
+let favourites = loadFavourites();
+let showOnlyFavourites = false;
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  });
+}
+
+function crestEl(team) {
+  const span = document.createElement("span");
+  span.className = "crest";
+  span.style.background = team.color;
+  span.title = team.name;
+  return span;
+}
+
+function renderTeamGrid() {
+  const grid = document.getElementById("team-grid");
+  grid.innerHTML = "";
+
+  TEAMS.forEach((team) => {
+    const btn = document.createElement("button");
+    btn.className = "team-card" + (favourites.has(team.id) ? " favourited" : "");
+    btn.setAttribute("aria-pressed", favourites.has(team.id));
+
+    btn.appendChild(crestEl(team));
+
+    const label = document.createElement("span");
+    label.textContent = team.name;
+    btn.appendChild(label);
+
+    const check = document.createElement("span");
+    check.className = "fav-check";
+    check.textContent = "★";
+    btn.appendChild(check);
+
+    btn.addEventListener("click", () => {
+      if (favourites.has(team.id)) {
+        favourites.delete(team.id);
+      } else {
+        favourites.add(team.id);
+      }
+      saveFavourites(favourites);
+      renderTeamGrid();
+      renderFixtures();
+    });
+
+    grid.appendChild(btn);
+  });
+}
+
+function renderFixtures() {
+  const list = document.getElementById("fixture-list");
+  const emptyState = document.getElementById("empty-state");
+  list.innerHTML = "";
+
+  if (showOnlyFavourites && favourites.size === 0) {
+    emptyState.hidden = false;
+    return;
+  }
+  emptyState.hidden = true;
+
+  const visible = FIXTURES.filter((f) => {
+    if (!showOnlyFavourites) return true;
+    return favourites.has(f.home) || favourites.has(f.away);
+  });
+
+  let lastMatchweek = null;
+
+  visible.forEach((fixture) => {
+    if (fixture.matchweek !== lastMatchweek) {
+      lastMatchweek = fixture.matchweek;
+      const heading = document.createElement("div");
+      heading.className = "matchweek-heading";
+      heading.textContent = `Matchweek ${fixture.matchweek}`;
+      list.appendChild(heading);
+    }
+
+    const home = teamsById[fixture.home];
+    const away = teamsById[fixture.away];
+    const isFavMatch = favourites.has(fixture.home) || favourites.has(fixture.away);
+
+    const card = document.createElement("div");
+    card.className = "fixture-card" + (isFavMatch ? " has-favourite" : "");
+
+    const homeSlot = document.createElement("div");
+    homeSlot.className = "team-slot home";
+    homeSlot.appendChild(crestEl(home));
+    const homeLabel = document.createElement("span");
+    homeLabel.textContent = home.short;
+    homeSlot.appendChild(homeLabel);
+    if (favourites.has(fixture.home)) {
+      const star = document.createElement("span");
+      star.className = "star";
+      star.textContent = "★";
+      homeSlot.appendChild(star);
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "fixture-meta";
+    meta.innerHTML = `<span class="time">${fixture.time}</span>${formatDate(fixture.date)}`;
+
+    const awaySlot = document.createElement("div");
+    awaySlot.className = "team-slot away";
+    if (favourites.has(fixture.away)) {
+      const star = document.createElement("span");
+      star.className = "star";
+      star.textContent = "★";
+      awaySlot.appendChild(star);
+    }
+    const awayLabel = document.createElement("span");
+    awayLabel.textContent = away.short;
+    awaySlot.appendChild(awayLabel);
+    awaySlot.appendChild(crestEl(away));
+
+    card.appendChild(homeSlot);
+    card.appendChild(meta);
+    card.appendChild(awaySlot);
+    list.appendChild(card);
+  });
+}
+
+function setupTabs() {
+  const tabFixtures = document.getElementById("tab-fixtures");
+  const tabTeams = document.getElementById("tab-teams");
+  const viewFixtures = document.getElementById("view-fixtures");
+  const viewTeams = document.getElementById("view-teams");
+
+  function activate(tab) {
+    const isFixtures = tab === "fixtures";
+    tabFixtures.classList.toggle("active", isFixtures);
+    tabTeams.classList.toggle("active", !isFixtures);
+    tabFixtures.setAttribute("aria-selected", isFixtures);
+    tabTeams.setAttribute("aria-selected", !isFixtures);
+    viewFixtures.classList.toggle("active", isFixtures);
+    viewTeams.classList.toggle("active", !isFixtures);
+  }
+
+  tabFixtures.addEventListener("click", () => activate("fixtures"));
+  tabTeams.addEventListener("click", () => activate("teams"));
+}
+
+function setupFilters() {
+  const allBtn = document.getElementById("filter-all");
+  const mineBtn = document.getElementById("filter-mine");
+
+  allBtn.addEventListener("click", () => {
+    showOnlyFavourites = false;
+    allBtn.classList.add("active");
+    mineBtn.classList.remove("active");
+    renderFixtures();
+  });
+
+  mineBtn.addEventListener("click", () => {
+    showOnlyFavourites = true;
+    mineBtn.classList.add("active");
+    allBtn.classList.remove("active");
+    renderFixtures();
+  });
+}
+
+setupTabs();
+setupFilters();
+renderTeamGrid();
+renderFixtures();

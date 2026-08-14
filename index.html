@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PL Schedule</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>PL Schedule</h1>
+    <div class="view-toggle" role="tablist">
+      <button id="tab-fixtures" class="tab active" role="tab" aria-selected="true">Fixtures</button>
+      <button id="tab-teams" class="tab" role="tab" aria-selected="false">My Teams</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="view-fixtures" class="view active">
+      <div class="filter-bar">
+        <button id="filter-all" class="filter-chip active">All Fixtures</button>
+        <button id="filter-mine" class="filter-chip">My Teams</button>
+      </div>
+      <div id="fixture-list" class="fixture-list"></div>
+      <p id="empty-state" class="empty-state" hidden>
+        No favourite teams selected yet. Go to "My Teams" to pick some.
+      </p>
+    </section>
+
+    <section id="view-teams" class="view">
+      <p class="section-hint">Tap a team to add it to your favourites.</p>
+      <div id="team-grid" class="team-grid"></div>
+    </section>
+  </main>
+
+  <script src="data/fixtures.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

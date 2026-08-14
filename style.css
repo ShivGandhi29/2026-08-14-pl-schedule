@@ -1,0 +1,255 @@
+:root {
+  --bg: #0d1117;
+  --panel: #161b22;
+  --border: #2a2f38;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --accent: #37003c; /* PL purple */
+  --accent-bright: #00ff85; /* PL green */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--accent);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tab {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: var(--accent-bright);
+  color: #04121a;
+  font-weight: 600;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  position: sticky;
+  top: 4.5rem;
+  background: var(--bg);
+  padding: 0.25rem 0 0.75rem;
+  z-index: 5;
+}
+
+.filter-chip {
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.filter-chip.active {
+  border-color: var(--accent-bright);
+  color: var(--accent-bright);
+}
+
+.matchweek-heading {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin: 1.5rem 0 0.5rem;
+}
+
+.matchweek-heading:first-child {
+  margin-top: 0;
+}
+
+.fixture-card {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.fixture-card.has-favourite {
+  border-color: var(--accent-bright);
+}
+
+.team-slot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.team-slot.away {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.crest {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.team-slot span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.fixture-meta {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.fixture-meta .time {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.star {
+  margin-left: 0.35rem;
+  color: var(--accent-bright);
+}
+
+.empty-state {
+  color: var(--text-dim);
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.section-hint {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin-top: 0;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+}
+
+.team-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.team-card .crest {
+  width: 28px;
+  height: 28px;
+}
+
+.team-card.favourited {
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 0 1px var(--accent-bright) inset;
+}
+
+.team-card .fav-check {
+  margin-left: auto;
+  color: var(--accent-bright);
+  visibility: hidden;
+}
+
+.team-card.favourited .fav-check {
+  visibility: visible;
+}
+
+@media (min-width: 640px) {
+  main {
+    max-width: 900px;
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .app-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .view-toggle {
+    flex: 0 0 auto;
+  }
+
+  .tab {
+    flex: none;
+    padding: 0.6rem 1.5rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .team-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
