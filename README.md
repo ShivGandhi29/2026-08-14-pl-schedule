@@ -1,4 +1,4 @@
-# PL Fixture Tracker
+# Kickcard
 
 A simple Premier League fixtures viewer where you pick your favourite team(s) and get a schedule filtered down to just their matches — built as a responsive web app so it works equally well on mobile (add to home screen) and desktop (browser tab). No login, no backend — your favourites are remembered locally on your device.
 
