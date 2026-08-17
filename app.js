@@ -27,12 +27,37 @@ function formatDate(dateStr) {
   });
 }
 
+function crestTextColor(hex) {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return luminance > 0.55 ? "#04140d" : "#f4f6f8";
+}
+
 function crestEl(team) {
   const span = document.createElement("span");
   span.className = "crest";
   span.style.background = team.color;
-  span.title = team.name;
+  span.style.color = crestTextColor(team.color);
+  span.textContent = team.short.slice(0, 3);
+  span.setAttribute("aria-hidden", "true");
   return span;
+}
+
+const STAR_PATH =
+  "M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z";
+
+function starIcon(className) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("fill", "currentColor");
+  svg.setAttribute("aria-hidden", "true");
+  svg.classList.add(className);
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", STAR_PATH);
+  svg.appendChild(path);
+  return svg;
 }
 
 function renderTeamGrid() {
@@ -40,20 +65,23 @@ function renderTeamGrid() {
   grid.innerHTML = "";
 
   TEAMS.forEach((team) => {
+    const isFav = favourites.has(team.id);
     const btn = document.createElement("button");
-    btn.className = "team-card" + (favourites.has(team.id) ? " favourited" : "");
-    btn.setAttribute("aria-pressed", favourites.has(team.id));
+    btn.className = "team-card" + (isFav ? " favourited" : "");
+    btn.setAttribute("aria-pressed", isFav);
+    btn.setAttribute(
+      "aria-label",
+      `${team.name}${isFav ? ", favourited" : ""}`
+    );
 
     btn.appendChild(crestEl(team));
 
     const label = document.createElement("span");
+    label.className = "team-name";
     label.textContent = team.name;
     btn.appendChild(label);
 
-    const check = document.createElement("span");
-    check.className = "fav-check";
-    check.textContent = "★";
-    btn.appendChild(check);
+    btn.appendChild(starIcon("fav-check"));
 
     btn.addEventListener("click", () => {
       if (favourites.has(team.id)) {
@@ -108,13 +136,11 @@ function renderFixtures() {
     homeSlot.className = "team-slot home";
     homeSlot.appendChild(crestEl(home));
     const homeLabel = document.createElement("span");
+    homeLabel.className = "team-name";
     homeLabel.textContent = home.short;
     homeSlot.appendChild(homeLabel);
     if (favourites.has(fixture.home)) {
-      const star = document.createElement("span");
-      star.className = "star";
-      star.textContent = "★";
-      homeSlot.appendChild(star);
+      homeSlot.appendChild(starIcon("fav-star"));
     }
 
     const meta = document.createElement("div");
@@ -124,12 +150,10 @@ function renderFixtures() {
     const awaySlot = document.createElement("div");
     awaySlot.className = "team-slot away";
     if (favourites.has(fixture.away)) {
-      const star = document.createElement("span");
-      star.className = "star";
-      star.textContent = "★";
-      awaySlot.appendChild(star);
+      awaySlot.appendChild(starIcon("fav-star"));
     }
     const awayLabel = document.createElement("span");
+    awayLabel.className = "team-name";
     awayLabel.textContent = away.short;
     awaySlot.appendChild(awayLabel);
     awaySlot.appendChild(crestEl(away));
